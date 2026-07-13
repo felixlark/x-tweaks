@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "X Reader Layout",
+  "version": "1.0.0",
+  "description": "Collapse X's right column by default, widen the timeline, and enlarge photos/videos. Toggle the right column from a floating button.",
+  "content_scripts": [
+    {
+      "matches": ["https://x.com/*", "https://twitter.com/*"],
+      "css": ["content.css"],
+      "js": ["content.js"],
+      "run_at": "document_start",
+      "all_frames": false
+    }
+  ]
+}

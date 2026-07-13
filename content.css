@@ -1,0 +1,81 @@
+/* X Reader Layout — all behavior hangs off html[data-xr="wide"], set by content.js. */
+
+/* 1. Hide the right column (search / trends / who-to-follow). */
+html[data-xr="wide"] [data-testid="sidebarColumn"] { display: none !important; }
+
+/* 2. Let the middle column grow to fill the area the right column vacated.
+      flex-fill (not a fixed px width) so it tracks the window: it fills the
+      region right of the left nav and never overflows the viewport. */
+html[data-xr="wide"] [data-testid="primaryColumn"] {
+  /* The column keeps X's own left/right divider lines (theme-adaptive). We move the
+     whole column so those two lines sit at the whitespace edges — 66px off the left
+     nav and 66px off the floating Grok/Chat dock, clear of the buttons — instead of
+     the right line cutting through the dock. Then 5% inner padding on each side sets
+     the gap between the lines and the content. Tuned for a ~1512px screen. */
+  flex: 0 0 auto !important;
+  width: min(899px, calc(100% - 132px)) !important;
+  max-width: 899px !important;
+  min-width: 0 !important;
+  margin-left: 66px !important;
+  margin-right: auto !important; /* absorbs the dock's column so the right line clears it */
+  box-sizing: border-box !important;
+  padding-inline: 5% !important;
+}
+
+/* 3. THE key one: X caps the timeline at max-width:600px on the div wrapping the
+      feed <section>. Release it so posts/text/media fill the column (composer and
+      feed align to the same width) instead of sitting in a narrow 600px strip. */
+html[data-xr="wide"] [data-testid="primaryColumn"] div:has(> section) {
+  max-width: none !important;
+}
+
+/* 4. Release X's inline media width caps so images/videos grow with the column. */
+html[data-xr="wide"] [data-testid="primaryColumn"] [style*="max-width"] {
+  max-width: 100% !important;
+}
+
+/* 5. Give tall photos/videos more vertical room (bounded so portraits stay sane). */
+html[data-xr="wide"] [data-testid="primaryColumn"] [data-testid="tweetPhoto"],
+html[data-xr="wide"] [data-testid="primaryColumn"] [data-testid="tweetPhoto"] img,
+html[data-xr="wide"] [data-testid="primaryColumn"] [data-testid="videoComponent"],
+html[data-xr="wide"] [data-testid="primaryColumn"] [data-testid="videoPlayer"] {
+  max-height: min(88vh, 1100px) !important;
+}
+
+/* 6. Spread the tweet action bar evenly. X grows reply/retweet/like/views but leaves
+      bookmark + share as fixed trailing items, so they bunch up once the tweet is
+      widened. Make all six children share the row equally. Scoped to the action bar
+      (the group that contains the reply button) so no other role="group" is touched. */
+html[data-xr="wide"] [role="group"]:has([data-testid="reply"]) > div {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  justify-content: flex-start !important;
+}
+
+/* ── Floating toggle button, sits in the bottom-right FAB stack. ── */
+#x-reader-toggle {
+  position: fixed;
+  right: 20px;
+  bottom: 150px; /* content.js re-stacks this just above the Grok/Chat buttons when found */
+  z-index: 2147483000;
+  width: 55px;
+  height: 55px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* Fallback look — matches X's Grok/Chat dock (squircle, light). content.js clones
+     the real dock button's computed style at runtime so it tracks the actual theme. */
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.85);
+  color: #0f1419;
+  border: 1px solid rgb(159, 181, 195);
+  box-shadow: rgba(101, 119, 134, 0.2) 0 0 15px 0, rgba(101, 119, 134, 0.15) 0 0 3px 1px;
+  backdrop-filter: blur(4px);
+  cursor: pointer;
+  padding: 0;
+  transition: transform .12s ease;
+}
+#x-reader-toggle:hover { transform: translateY(-1px); }
+#x-reader-toggle:active { transform: translateY(0); }
+#x-reader-toggle svg { width: 24px; height: 24px; display: block; }
+#x-reader-toggle[data-collapsed="true"] .xr-pane { fill: currentColor; opacity: .9; }
