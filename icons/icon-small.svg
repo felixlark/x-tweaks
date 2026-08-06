@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+  <!-- 16/32px variant of the X Tweaks mark: less padding, a wider and lighter
+       side strip, so the two-panel shape still reads at toolbar size. -->
+  <rect x="0" y="0" width="16" height="16" rx="3.5" fill="#0F1419"/>
+  <rect x="2" y="3" width="8" height="10" rx="1.6" fill="#FFFFFF"/>
+  <rect x="11.4" y="3" width="2.6" height="10" rx="1.1" fill="#8B98A5"/>
+</svg>

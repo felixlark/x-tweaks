@@ -43,6 +43,8 @@ to the source, hit **Reload** on the extension card and refresh the x.com window
 | `content.css` | All layout rules, gated on `html[data-xr="wide"]` |
 | `content.js` | Owns the persisted on/off boolean and the floating toggle button |
 | `nav-keys.js` | The `⌘⇧E` / `⌘⇧D` history bindings |
+| `icons/` | Source SVGs plus the rendered 16/32/48/128 PNGs |
+| `store/` | Chrome Web Store listing copy and `package.sh`, which builds the upload zip |
 
 The CSS hangs off a single attribute on `<html>` rather than off DOM structure, which is what makes
 it survive X's client-side navigation for free — the script sets the attribute once and never has to
@@ -97,6 +99,8 @@ open -a "Google Chrome" "chrome://extensions"
 | `content.css` | 全部布局规则，挂在 `html[data-xr="wide"]` 上 |
 | `content.js` | 负责持久化的开关状态和那个悬浮按钮 |
 | `nav-keys.js` | `⌘⇧E` / `⌘⇧D` 历史导航绑定 |
+| `icons/` | 图标源 SVG 和渲染出来的 16/32/48/128 PNG |
+| `store/` | Chrome Web Store 上架文案，以及打包用的 `package.sh` |
 
 CSS 挂在 `<html>` 的一个属性上，而不是依赖 DOM 结构，这样 X 的前端路由跳转天然不会破坏它 ——
 脚本只设置一次属性，之后路由怎么变都不用重新应用。

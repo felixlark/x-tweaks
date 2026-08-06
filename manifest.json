@@ -3,6 +3,13 @@
   "name": "X Tweaks",
   "version": "1.1.0",
   "description": "Reading tweaks for x.com: collapse the right column, widen the timeline, enlarge photos/videos, and add ⌘⇧E / ⌘⇧D history navigation. Works in installed-PWA windows too.",
+  "homepage_url": "https://github.com/longbiaochen/x-tweaks",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
   "content_scripts": [
     {
       "matches": ["https://x.com/*", "https://twitter.com/*"],
