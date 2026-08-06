@@ -31,3 +31,4 @@ build/
 .cache/
 DerivedData/
 dist/
+store/screenshots/
