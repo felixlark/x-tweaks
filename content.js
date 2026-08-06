@@ -1,4 +1,4 @@
-// X Reader Layout — content script.
+// X Tweaks — reading-layout content script.
 //
 // CSS lives in content.css and hangs off html[data-xr="wide"], so it survives
 // SPA navigation for free. This script only owns the persisted on/off boolean

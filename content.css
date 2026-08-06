@@ -1,4 +1,4 @@
-/* X Reader Layout — all behavior hangs off html[data-xr="wide"], set by content.js. */
+/* X Tweaks — all layout behavior hangs off html[data-xr="wide"], set by content.js. */
 
 /* 1. Hide the right column (search / trends / who-to-follow). */
 html[data-xr="wide"] [data-testid="sidebarColumn"] { display: none !important; }

@@ -1,13 +1,13 @@
 {
   "manifest_version": 3,
-  "name": "X Reader Layout",
-  "version": "1.0.0",
-  "description": "Collapse X's right column by default, widen the timeline, and enlarge photos/videos. Toggle the right column from a floating button.",
+  "name": "X Tweaks",
+  "version": "1.1.0",
+  "description": "Reading tweaks for x.com: collapse the right column, widen the timeline, enlarge photos/videos, and add ⌘⇧E / ⌘⇧D history navigation. Works in installed-PWA windows too.",
   "content_scripts": [
     {
       "matches": ["https://x.com/*", "https://twitter.com/*"],
       "css": ["content.css"],
-      "js": ["content.js"],
+      "js": ["content.js", "nav-keys.js"],
       "run_at": "document_start",
       "all_frames": false
     }
