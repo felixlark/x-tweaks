@@ -89,6 +89,24 @@ the extension actually working, so these have to be real captures, not mockups. 
 2. The same view with the right column toggled back, so the button's purpose is visible.
 3. An installed-PWA window, since the keyboard shortcuts are aimed at that case.
 
+## What actually blocked submission (2026-08-06)
+
+The dashboard's "Why can't I submit?" dialog listed six items. Four are on the Privacy practices
+tab and are answered above; two can only be done by the publisher:
+
+1. Host permission justification — Privacy practices tab.
+2. Remote code justification — Privacy practices tab. Select **"No, I am not using remote code"**;
+   nothing is loaded from outside the package, so no free-text justification is needed.
+3. Single purpose description — Privacy practices tab.
+4. Certify data usage complies with the Developer Program Policies — the three checkboxes at the
+   bottom of the Privacy practices tab.
+5. Publisher contact email — **Settings** page, not the item page.
+6. Verify that contact email — Google sends a confirmation mail; the link has to be clicked.
+
+The tab does not autosave: click **Save draft** before navigating away, on every tab.
+
+Distribution tab: visibility is Public / Unlisted / Private, and regions default to all.
+
 ## Notes before submitting
 
 - **Name and trademark.** The store rejects listings that imply endorsement by a trademark holder.
