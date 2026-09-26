@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>X Tweaks compact navigation fixture</title>
+    <link rel="stylesheet" href="../content.css">
+    <style>
+      * { box-sizing: border-box; }
+      html { overflow-y: scroll; }
+      body { margin: 0; display: flex; min-height: 100vh; font-family: Arial, sans-serif; }
+      header { display: flex; flex: 0 0 184px; align-items: flex-end; }
+      header > div { width: 68px; }
+      header > div > div { width: 68px; }
+      header > div > div > div { width: 68px; }
+      header > div > div > div > div { width: 52px; }
+      header > div > div > div > div > div { width: 52px; }
+      nav { display: flex; width: 52px; flex-direction: column; align-items: center; }
+      nav a, nav button, [data-testid^="SideNav_"] {
+        display: flex; width: 52px; height: 50px; align-items: center; border: 0;
+        background: transparent; color: #0f1419; text-decoration: none;
+      }
+      nav a > div, nav button > div, [data-testid^="SideNav_"] > div {
+        display: flex; height: 50px; padding: 12px; align-items: center;
+        border-radius: 999px;
+      }
+      .icon { display: block; width: 24px; height: 24px; flex: 0 0 24px; border: 2px solid currentColor; border-radius: 7px; }
+      .avatar { display: block; width: 40px; height: 40px; border-radius: 999px; background: #cfd9de; }
+      [data-testid="SideNav_NewTweet_Button"] { margin-top: 8px; }
+      [data-testid="SideNav_NewTweet_Button"] > div { color: white; background: #0f1419; }
+      main { display: flex; flex: 1 1 auto; min-width: 0; }
+      [data-testid="primaryColumn"] { border-left: 1px solid #eff3f4; }
+      .mxga-fixture {
+        position: fixed; top: 80px; right: 12px; width: 312px; height: 240px;
+        padding: 16px; border: 1px solid #d8e0e4; border-radius: 14px;
+        background: white; box-shadow: 0 8px 28px rgb(15 20 25 / 14%);
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div><div><div><div><div>
+        <nav aria-label="Primary">
+          <a href="/home" aria-label="Home" data-testid="AppTabBar_Home_Link"><div><span class="icon"></span></div></a>
+          <a href="/explore" aria-label="Search and explore" data-testid="AppTabBar_Explore_Link"><div><span class="icon"></span></div></a>
+          <a href="/notifications" aria-label="Notifications" data-testid="AppTabBar_Notifications_Link"><div><span class="icon"></span></div></a>
+          <a href="/i/chat" aria-label="Direct Messages" data-testid="AppTabBar_DirectMessage_Link"><div><span class="icon"></span></div></a>
+          <a href="/felixlark" aria-label="Profile" data-testid="AppTabBar_Profile_Link"><div><span class="icon"></span></div></a>
+          <a href="/i/jf/creators/studio" aria-label="Creator Studio"><div><span class="icon"></span></div></a>
+          <button aria-label="More menu items" data-testid="AppTabBar_More_Menu"><div><span class="icon"></span></div></button>
+        </nav>
+        <a href="/compose/post" aria-label="Post" data-testid="SideNav_NewTweet_Button"><div><span class="icon"></span></div></a>
+        <button aria-label="Account menu" data-testid="SideNav_AccountSwitcher_Button"><div><img class="avatar" alt="felix" src="data:image/gif;base64,R0lGODlhAQABAAAAACw="></div></button>
+      </div></div></div></div></div>
+    </header>
+    <main><div style="width:990px;max-width:1050px"><div data-testid="primaryColumn">
+      <h1>Compact navigation fixture</h1>
+      <p>Wide mode uses a 220px text navigation and leaves a permanent 340px tool lane. Toggle normal mode to check restoration.</p>
+    </div></div></main>
+    <aside class="mxga-fixture">MXGA working panel fixture</aside>
+    <script>
+      // Exercise both native labels and labels restored by the extension.
+      const params = new URLSearchParams(location.search);
+      if (params.has("native")) {
+        document.querySelectorAll("nav a, nav button").forEach((item) => {
+          const label = document.createElement("div");
+          const text = document.createElement("span");
+          text.textContent = item.getAttribute("aria-label");
+          label.append(text);
+          item.firstElementChild.append(label);
+        });
+      }
+      if (params.has("dark")) {
+        document.documentElement.style.colorScheme = "dark";
+        const style = document.createElement("style");
+        style.textContent = "body, .mxga-fixture { background:#15202b; color:#f7f9f9; } nav a, nav button, [data-testid^='SideNav_'] { color:inherit; }";
+        document.head.append(style);
+      }
+    </script>
+    <script src="../content.js"></script>
+  </body>
+</html>
