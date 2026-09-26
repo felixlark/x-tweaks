@@ -157,35 +157,6 @@
     markForcedNav(nav);
   }
 
-  // Mark both expanded and compact navigation without changing native labels.
-  // Separate attributes keep wide geometry independent of label restoration.
-  function syncWideGeometry() {
-    document.querySelectorAll(
-      "[data-xr-wide-frame], [data-xr-wide-header], [data-xr-wide-shell], " +
-      "[data-xr-wide-main], [data-xr-wide-main-shell], [data-xr-wide-panel]"
-    ).forEach((el) => {
-      for (const name of el.getAttributeNames()) {
-        if (name.startsWith("data-xr-wide-")) el.removeAttribute(name);
-      }
-    });
-    const home = document.querySelector('[data-testid="AppTabBar_Home_Link"]');
-    const nav = home?.closest("nav");
-    const header = nav?.closest("header");
-    const primary = document.querySelector('[data-testid="primaryColumn"]');
-    const main = primary?.closest("main");
-    if (!header || !main || !header.parentElement?.contains(main)) return;
-    header.parentElement.setAttribute("data-xr-wide-frame", "");
-    header.setAttribute("data-xr-wide-header", "");
-    main.setAttribute("data-xr-wide-main", "");
-    nav.setAttribute("data-xr-wide-panel", "");
-    for (let el = primary.parentElement; el && el !== main; el = el.parentElement) {
-      el.setAttribute("data-xr-wide-main-shell", "");
-    }
-    for (let el = nav.parentElement; el && el !== header; el = el.parentElement) {
-      el.setAttribute("data-xr-wide-shell", "");
-    }
-  }
-
   // X also inserts an in-flow "Show N posts" row when new Home posts arrive.
   // Mark only that exact row so CSS can hide its whole 49px footprint in wide
   // mode. X may reuse the node, so remove our mark if its purpose changes.
@@ -234,7 +205,6 @@
     requestAnimationFrame(() => {
       navSyncQueued = false;
       syncNav();
-      syncWideGeometry();
       syncNewPostsRow();
       syncSinglePhotos();
     });
@@ -354,7 +324,6 @@
     buildButton();
     watchRoute();
     syncNav();
-    syncWideGeometry();
     syncNewPostsRow();
     syncSinglePhotos();
     new MutationObserver(scheduleNavSync).observe(document.body, { childList: true, subtree: true });

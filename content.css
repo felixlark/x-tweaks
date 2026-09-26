@@ -1,14 +1,12 @@
 /* X Tweaks — all layout behavior hangs off html[data-xr="wide"], set by content.js. */
 
-/* Normal-mode navigation retains X's centered 1265px application frame. The companion
-   MXGA panel is ~312px wide, so a 340px lane leaves it a 16px inner gap plus its
-   native right inset. X Tweaks only reserves this lane — it never styles MXGA. */
+/* X centers a 1265px application frame; its left header is 275px plus half the
+   remaining gutter. The companion MXGA panel is fixed ~312px wide at the viewport's
+   right edge, so a 340px lane leaves it a 16px inner gap plus its native inset.
+   X Tweaks only reserves this lane — it never styles MXGA. */
 html {
   --xr-nav-track: calc(275px + max(0px, (100vw - 1265px) / 2));
-  --xr-frame-width: 1265px;
-  /* MXGA is fixed to the viewport, not to X's centered application frame.
-     Reserve only the part of its 340px safety area that overlaps the frame. */
-  --xr-tool-lane: max(0px, calc(340px - max(0px, (100vw - var(--xr-frame-width)) / 2)));
+  --xr-tool-lane: 340px;
 }
 
 /* Keep X's primary navigation expanded whenever X omits its native text nodes.
@@ -133,83 +131,16 @@ html[data-xr="wide"] [data-testid="primaryColumn"] [data-xr-new-posts-row] {
   display: none !important;
 }
 
-/* 2. Give the timeline the remaining room inside X's centered frame, stopping
-      before the fixed MXGA panel when it overlaps the frame. */
-html[data-xr="wide"] [data-testid="primaryColumn"] {
+/* 2. Let the middle column take the room the right column leaves behind. The left
+      navigation and the column's left edge stay exactly where X puts them on every
+      page; only the right edge moves, stopping before the MXGA lane. Pages that
+      have no right column (Grok, Settings, …) keep X's own layout. */
+html[data-xr="wide"] :has(> [data-testid="sidebarColumn"]) > [data-testid="primaryColumn"] {
   flex: 0 0 auto !important;
-  width: min(1100px, max(0px, calc(100% - var(--xr-tool-lane)))) !important;
-  max-width: 1100px !important;
-  min-width: 0 !important;
-  margin-left: 0 !important;
-  margin-right: var(--xr-tool-lane) !important;
-  box-sizing: border-box !important;
-  padding-inline: 16px !important;
-}
-
-
-/* Wide mode redistributes X's native 1265px frame; it never expands the page to
-   the viewport edges. Normal mode and Chat retain X's own layout. */
-html[data-xr="wide"] { --xr-nav-track: 220px; }
-html[data-xr="wide"] [data-xr-wide-frame] {
-  width: min(100%, var(--xr-frame-width)) !important;
-  max-width: var(--xr-frame-width) !important;
-  margin-inline: auto !important;
-  justify-content: flex-start !important;
-}
-html[data-xr="wide"] [data-xr-wide-header] {
-  flex: 0 0 220px !important;
-  width: 220px !important;
-  min-width: 220px !important;
-  align-items: flex-start !important;
-}
-html[data-xr="wide"] [data-xr-wide-shell] {
-  width: 220px !important;
-  min-width: 0 !important;
-  max-width: 220px !important;
-  box-sizing: border-box !important;
-}
-/* X keeps a 60px desktop gutter on the outer nav shell after the header shrinks. */
-html[data-xr="wide"] [data-xr-wide-header] > [data-xr-wide-shell] {
-  margin-left: 0 !important;
-}
-html[data-xr="wide"] [data-xr-wide-main] {
-  flex: 1 1 0 !important;
-  width: calc(100% - 220px) !important;
-  min-width: 0 !important;
-  align-items: flex-start !important;
-}
-html[data-xr="wide"] [data-xr-wide-main-shell] {
-  width: 100% !important;
+  width: min(100%, calc(100vw - var(--xr-nav-track) - var(--xr-tool-lane))) !important;
   max-width: none !important;
   min-width: 0 !important;
 }
-html[data-xr="wide"] [data-xr-wide-panel],
-html[data-xr="wide"] [data-xr-wide-panel] > *,
-html[data-xr="wide"] [data-xr-wide-header] [data-testid="SideNav_AccountSwitcher_Button"] {
-  width: 204px !important;
-  min-width: 0 !important;
-  max-width: 204px !important;
-  box-sizing: border-box !important;
-}
-html[data-xr="wide"] [data-xr-wide-panel] a > div,
-html[data-xr="wide"] [data-xr-wide-panel] button > div {
-  max-width: 100% !important;
-}
-html[data-xr="wide"] [data-xr-wide-panel] a > div > div:has(span),
-html[data-xr="wide"] [data-xr-wide-panel] button > div > div:has(span),
-html[data-xr="wide"] [data-xr-wide-panel] .xr-nav-label {
-  min-width: 0 !important;
-  margin-inline: 12px 4px !important;
-  font-size: 18px !important;
-}
-html[data-xr="wide"] [data-xr-wide-header] [data-testid="SideNav_NewTweet_Button"] {
-  width: 188px !important;
-  max-width: 188px !important;
-  min-width: 0 !important;
-  box-sizing: border-box !important;
-}
-html[data-xr="wide"] .xr-nav-account-name,
-html[data-xr="wide"] .xr-nav-account-handle { max-width: 120px; }
 
 /* 3. THE key one: X caps the timeline at max-width:600px on the div wrapping the
       feed <section>. Release it so posts/text/media fill the column (composer and
