@@ -7,6 +7,7 @@
 html {
   --xr-nav-track: calc(275px + max(0px, (100vw - 1265px) / 2));
   --xr-tool-lane: 340px;
+  --xr-nav-font: TwitterChirp, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 /* Keep X's primary navigation expanded whenever X omits its native text nodes.
@@ -47,8 +48,9 @@ html[data-xr-nav="forced"] [data-xr-nav-kind="tab"] .xr-nav-label {
   display: block;
   margin: 0 16px 0 20px;
   overflow: hidden;
-  color: inherit;
+  color: var(--xr-nav-color, inherit);
   font: inherit;
+  font-family: var(--xr-nav-font);
   font-size: 20px;
   line-height: 24px;
   text-overflow: ellipsis;
@@ -80,6 +82,7 @@ html[data-xr-nav="forced"] [data-xr-nav-kind="post"] .xr-nav-label {
   margin-left: 12px;
   color: inherit;
   font: inherit;
+  font-family: var(--xr-nav-font);
   font-size: 17px;
   font-weight: 700;
   line-height: 20px;
@@ -104,6 +107,7 @@ html[data-xr-nav="forced"] .xr-nav-account-copy {
   align-items: flex-start;
   color: inherit;
   font: inherit;
+  font-family: var(--xr-nav-font);
   line-height: 20px;
   white-space: nowrap;
 }

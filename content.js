@@ -12,6 +12,7 @@
   const NAV_ATTR = "data-xr-nav";
   const BTN_ID = "x-reader-toggle";
   const NAV_LABEL_CLASS = "xr-nav-label";
+  const observedNavHeaders = new WeakSet();
 
   // Default = collapsed (wide). Only an explicit "false" reopens the right column.
   const isCollapsed = () => localStorage.getItem(STORAGE_KEY) !== "false";
@@ -55,6 +56,7 @@
           "[data-xr-nav-panel], [data-xr-nav-item], [data-xr-nav-label-host], [data-xr-nav-kind]"
       )
       .forEach((el) => {
+        el.style.removeProperty("--xr-nav-color");
         for (const name of [...el.getAttributeNames()]) {
           if (name.startsWith("data-xr-nav-")) el.removeAttribute(name);
         }
@@ -95,6 +97,14 @@
     document.documentElement.setAttribute(NAV_ATTR, "forced");
     header.setAttribute("data-xr-nav-header", "");
     nav.setAttribute("data-xr-nav-panel", "");
+    if (!observedNavHeaders.has(header)) {
+      // Theme changes can update only native icon classes/styles, without
+      // inserting nodes. Re-sample their color when that happens.
+      new MutationObserver(scheduleNavSync).observe(header, {
+        attributes: true, subtree: true, attributeFilter: ["class", "style"],
+      });
+      observedNavHeaders.add(header);
+    }
 
     // X's expanded layout uses two 259px content wrappers inside three 275px
     // shell wrappers. Mark the live structure rather than relying on hash classes.
@@ -120,6 +130,15 @@
             : "tab";
       item.setAttribute("data-xr-nav-item", "");
       item.setAttribute("data-xr-nav-kind", kind);
+      const icon = item.querySelector("svg");
+      if (icon) {
+        // Compact X anchors retain the browser's default link color. The
+        // native SVG, unlike its wrapper, carries the actual theme color.
+        const color = getComputedStyle(icon).color;
+        if (item.style.getPropertyValue("--xr-nav-color") !== color) {
+          item.style.setProperty("--xr-nav-color", color);
+        }
+      }
 
       if (kind === "account") {
         ensureAccountCopy(item, header);

@@ -8,7 +8,9 @@
     <style>
       * { box-sizing: border-box; }
       html { overflow-y: scroll; }
-      body { margin: 0; display: flex; min-height: 100vh; font-family: Arial, sans-serif; }
+      /* Compact X wrappers have no font/link-color reset. Keep browser defaults
+         here so inherited Times and blue/purple link regressions are visible. */
+      body { margin: 0; display: flex; min-height: 100vh; }
       header { display: flex; flex: 0 0 184px; align-items: flex-end; }
       header > div { width: 68px; }
       header > div > div { width: 68px; }
@@ -18,16 +20,18 @@
       nav { display: flex; width: 52px; flex-direction: column; align-items: center; }
       nav a, nav button, [data-testid^="SideNav_"] {
         display: flex; width: 52px; height: 50px; align-items: center; border: 0;
-        background: transparent; color: #0f1419; text-decoration: none;
+        background: transparent; text-decoration: none;
       }
       nav a > div, nav button > div, [data-testid^="SideNav_"] > div {
         display: flex; height: 50px; padding: 12px; align-items: center;
         border-radius: 999px;
       }
-      .icon { display: block; width: 24px; height: 24px; flex: 0 0 24px; border: 2px solid currentColor; border-radius: 7px; }
+      .icon { display: block; width: 24px; height: 24px; flex: 0 0 24px; color: #0f1419; border: 2px solid currentColor; border-radius: 7px; }
       .avatar { display: block; width: 40px; height: 40px; border-radius: 999px; background: #cfd9de; }
       [data-testid="SideNav_NewTweet_Button"] { margin-top: 8px; }
       [data-testid="SideNav_NewTweet_Button"] > div { color: white; background: #0f1419; }
+      [data-testid="SideNav_NewTweet_Button"] .icon { color: white; }
+      [data-testid="SideNav_AccountSwitcher_Button"] { color: #0f1419; }
       main { display: flex; flex: 1 1 auto; min-width: 0; }
       [data-testid="primaryColumn"] { border-left: 1px solid #eff3f4; }
       .mxga-fixture {
@@ -60,11 +64,18 @@
     <aside class="mxga-fixture">MXGA working panel fixture</aside>
     <script>
       // Exercise both native labels and labels restored by the extension.
+      document.querySelectorAll(".icon").forEach((icon) => {
+        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.setAttribute("class", "icon");
+        icon.replaceWith(svg);
+      });
       const params = new URLSearchParams(location.search);
       if (params.has("native")) {
         document.querySelectorAll("nav a, nav button").forEach((item) => {
           const label = document.createElement("div");
           const text = document.createElement("span");
+          text.style.fontFamily = "Arial, sans-serif";
+          text.style.color = "#0f1419";
           text.textContent = item.getAttribute("aria-label");
           label.append(text);
           item.firstElementChild.append(label);
@@ -73,7 +84,7 @@
       if (params.has("dark")) {
         document.documentElement.style.colorScheme = "dark";
         const style = document.createElement("style");
-        style.textContent = "body, .mxga-fixture { background:#15202b; color:#f7f9f9; } nav a, nav button, [data-testid^='SideNav_'] { color:inherit; }";
+        style.textContent = "body, .mxga-fixture { background:#15202b; color:#f7f9f9; } nav .icon, [data-testid='SideNav_AccountSwitcher_Button'] { color:#f7f9f9; }";
         document.head.append(style);
       }
     </script>
