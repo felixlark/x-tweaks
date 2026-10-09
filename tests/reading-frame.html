@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>X Tweaks reading frame regression</title>
+  <link rel="stylesheet" href="../content.css">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 15px Arial, sans-serif; }
+    .app { display: flex; width: 100%; }
+    header { flex: 0 0 calc(275px + max(0px, (100vw - 1265px) / 2)); }
+    main { display: flex; flex: 1 1 auto; align-items: flex-start; }
+    .shell { display: flex; flex: 1 1 auto; }
+    .frame { display: flex; flex: 1 0 auto; width: 990px; max-width: 1050px; }
+    .row { display: flex; flex: 1 0 auto; width: 990px; }
+    [data-testid="primaryColumn"] { width: 600px; max-width: 600px; min-width: 600px; flex: 0 0 auto; border: 1px solid #cfd9de; }
+    [data-testid="sidebarColumn"] { width: 350px; margin-left: 30px; flex: 0 0 auto; }
+    [data-testid="primaryColumn"] > div { max-width: 600px; }
+    article { padding: 16px; border-bottom: 1px solid #cfd9de; overflow-wrap: anywhere; }
+    #mxga-entry { position: fixed; top: 12px; right: 12px; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>Native navigation</header>
+    <main><div class="shell"><div class="frame"><div class="row">
+      <div data-testid="primaryColumn"><div><section>
+        <article data-testid="tweet">A post should fill the reading area beside the native navigation.</article>
+        <article data-testid="tweet">Replies should use the same full width without horizontal overflow.</article>
+      </section></div></div>
+      <aside data-testid="sidebarColumn">Native right sidebar</aside>
+    </div></div></div></main>
+  </div>
+  <button id="mxga-entry">MXGA floating entry</button>
+  <script>
+    if (new URLSearchParams(location.search).has("no-sidebar")) {
+      document.querySelector('[data-testid="sidebarColumn"]').remove();
+    }
+  </script>
+  <script src="../content.js"></script>
+</body>
+</html>

@@ -1,12 +1,10 @@
 /* X Tweaks — all layout behavior hangs off html[data-xr="wide"], set by content.js. */
 
 /* X centers a 1265px application frame; its left header is 275px plus half the
-   remaining gutter. The companion MXGA panel is fixed ~312px wide at the viewport's
-   right edge, so a 340px lane leaves it a 16px inner gap plus its native inset.
-   X Tweaks only reserves this lane — it never styles MXGA. */
+   remaining gutter. Keep that native navigation track. Reading uses all the
+   remaining space; MXGA keeps its own floating controls without a reserved lane. */
 html {
   --xr-nav-track: calc(275px + max(0px, (100vw - 1265px) / 2));
-  --xr-tool-lane: 340px;
   --xr-nav-font: TwitterChirp, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
@@ -135,13 +133,37 @@ html[data-xr="wide"] [data-testid="primaryColumn"] [data-xr-new-posts-row] {
   display: none !important;
 }
 
-/* 2. Let the middle column take the room the right column leaves behind. The left
-      navigation and the column's left edge stay exactly where X puts them on every
-      page; only the right edge moves, stopping before the MXGA lane. Pages that
-      have no right column (Grok, Settings, …) keep X's own layout. */
+/* 2. Fill the main area's actual available width, rather than guessing from the
+      viewport and a fixed tool lane. X's wrappers retain a 990px width even after
+      the sidebar is hidden; allow every enclosing wrapper to shrink on portrait
+      displays and grow on wider ones. Scope this to X's two-column reading frame,
+      leaving Grok/Settings (no sidebar) and Chat (normal mode) native. */
+html[data-xr]:not([data-xr-chat]) main:has([data-testid="primaryColumn"]):has([data-testid="sidebarColumn"]) {
+  min-width: 0 !important;
+  align-items: stretch !important;
+}
+
+html[data-xr]:not([data-xr-chat]) main div:has([data-testid="primaryColumn"]):has([data-testid="sidebarColumn"]) {
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  max-width: 990px !important;
+  min-width: 0 !important;
+}
+
+html[data-xr="wide"]:not([data-xr-chat]) main div:has([data-testid="primaryColumn"]):has([data-testid="sidebarColumn"]) {
+  max-width: none !important;
+}
+
+/* Restoring the sidebar retains native column caps but lets the reading column
+   shrink to fit a portrait window, including when navigation labels are forced. */
+html[data-xr="normal"]:not([data-xr-chat]) :has(> [data-testid="sidebarColumn"]) > [data-testid="primaryColumn"] {
+  flex: 1 1 600px !important;
+  min-width: 0 !important;
+}
+
 html[data-xr="wide"] :has(> [data-testid="sidebarColumn"]) > [data-testid="primaryColumn"] {
-  flex: 0 0 auto !important;
-  width: min(100%, calc(100vw - var(--xr-nav-track) - var(--xr-tool-lane))) !important;
+  flex: 1 1 auto !important;
+  width: 100% !important;
   max-width: none !important;
   min-width: 0 !important;
 }

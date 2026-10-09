@@ -13,11 +13,11 @@ injected into x.com and nothing else.
 
 **Wide reading layout.** The right column (search, trends, who-to-follow) is hidden by default.
 The left navigation and the timeline's left edge stay exactly where X puts them, on every page;
-the timeline only grows to the right into the space the right column vacated, stopping 340px
-short of the viewport's right edge so it never sits under the Make X Great Again panel. Home,
+the timeline grows to fill all remaining width beside the navigation. Fixed-width frame wrappers
+also shrink on portrait displays, avoiding horizontal overflow. Home,
 profiles, posts, search and lists therefore share one column geometry, and pages that have no
 right column (Grok, Settings) keep X's own layout. Images and videos scale with the reading column and keep their aspect
-ratio, without sitting under the companion extension's popup.
+ratio. Make X Great Again keeps its floating controls; no blank lane is reserved for its panel.
 
 On Home in wide mode, the floating "new posts" pill and in-flow "Show N posts" row are hidden.
 Other status messages remain visible; refresh the page manually when you want new posts.
@@ -75,9 +75,9 @@ since content scripts can't see the page's `pushState` calls from the isolated w
   instead. PWA windows generally don't carry that command, which is where the binding matters.
 - The layout selectors follow X's `data-testid` attributes (`sidebarColumn`, `primaryColumn`). Those
   are stable in practice but not a contract — if X reshuffles them, the CSS needs a look.
-- Desktop layout is checked at 1280, 1512, and 1920px. The reading column is 650px at 1280px,
-  766px at 1512px and 970px at 1920px, never wider than X's own two-column row. Narrow
-  mobile layouts are not a target.
+- Reading layout is checked at 1152, 1280, 1512, and 1920px, including a portrait display.
+  The column fills the actual main area, with no fixed tool lane or 990px frame cap.
+  Narrow mobile layouts are not a target.
 
 ---
 
@@ -90,7 +90,7 @@ since content scripts can't see the page's `pushState` calls from the isolated w
 
 ## 功能
 
-**宽阅读布局。** 默认隐藏右栏（搜索、趋势、推荐关注），左侧导航和时间线左边缘在所有页面都保持 X 原生位置，时间线只向右扩展到右栏腾出的空间，并在距视口右边缘 340px 处停下，不会被 Make X Great Again 面板遮挡。首页、个人主页、帖子详情、搜索、列表因此使用同一套版心；本来就没有右栏的页面（Grok、设置）保持 X 原样。单张图片按原比例在帖子中居中，竖图高度最多 720px；横屏图片和视频随阅读栏放大，不会被浮窗盖住。
+**宽阅读布局。** 默认隐藏右栏（搜索、趋势、推荐关注），左侧导航和时间线左边缘在所有页面都保持 X 原生位置，阅读列填满左导航之外的全部剩余宽度，固定宽度的外层容器也随竖屏缩小，避免横向溢出。Make X Great Again 保留悬浮入口，不再预留空白栏。首页、个人主页、帖子详情、搜索、列表因此使用同一套版心；本来就没有右栏的页面（Grok、设置）保持 X 原样。单张图片按原比例在帖子中居中，竖图高度最多 720px；横屏图片和视频随阅读栏放大。
 
 首页宽阅读模式隐藏“有新帖子”悬浮条和“显示 N 条帖子”提示行；其他状态消息仍显示，需要更新时可手动刷新。
 
@@ -139,4 +139,4 @@ isolated world 里看不到页面的 `pushState`，它靠监听 `<title>` 变化
   所以在普通标签页可能会弹出书签对话框。PWA 窗口一般没有这条命令，而那正是这个绑定真正要解决的场景。
 - 布局选择器依赖 X 的 `data-testid`（`sidebarColumn`、`primaryColumn`）。实际上挺稳定，但不是什么契约，
   X 一旦改结构，CSS 就得跟着看一眼。
-- 桌面布局按 1280、1512、1920px 检查；阅读列在这三种宽度下分别约为 650、766、970px，不会超过 X 原生双栏的宽度。暂不针对手机窄屏布局。
+- 阅读布局按 1152、1280、1512、1920px 检查，包含竖屏；阅读列填满实际主区域，不再预留工具栏，也不受 990px 外层宽度限制。暂不针对手机窄屏布局。
