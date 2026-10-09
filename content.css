@@ -2,11 +2,12 @@
 
 /* Navigation stays entirely native, including X's responsive compact mode. */
 
-/* Collapse the navigation's centering gutter to its native inner width. Scope
-   this to wide reading pages so Chat and pages without a sidebar stay native. */
-html[data-xr="wide"]:not([data-xr-chat]) header:has(+ main [data-testid="primaryColumn"]):has(+ main [data-testid="sidebarColumn"]) {
+/* Match Grok's native 1050px frame (980px content + 70px trailing gutter).
+   Its navigation slot includes 60px beyond the responsive inner navigation;
+   the remaining viewport space is split equally around that native frame. */
+html[data-xr]:not([data-xr-chat]) header:has(+ main [data-testid="primaryColumn"]):has(+ main [data-testid="sidebarColumn"]) {
   flex: 0 0 auto !important;
-  width: var(--xr-nav-width, max-content) !important;
+  width: calc(var(--xr-nav-width, 275px) + 60px + max(0px, (100vw - var(--xr-nav-width, 275px) - 60px - 1050px) / 2)) !important;
 }
 
 /* 1. Hide the right column (search / trends / who-to-follow). */
@@ -40,6 +41,12 @@ html[data-xr]:not([data-xr-chat]) main div:has([data-testid="primaryColumn"]):ha
 
 html[data-xr="wide"]:not([data-xr-chat]) main div:has([data-testid="primaryColumn"]):has([data-testid="sidebarColumn"]) {
   max-width: none !important;
+}
+
+html[data-xr]:not([data-xr-chat]) main:has([data-testid="primaryColumn"]):has([data-testid="sidebarColumn"]) > div {
+  max-width: 1050px !important;
+  padding-right: 70px !important;
+  box-sizing: border-box !important;
 }
 
 /* Restoring the sidebar retains native column caps but lets the reading column

@@ -12,12 +12,12 @@ injected into x.com and nothing else.
 ## What it does
 
 **Wide reading layout.** The right column (search, trends, who-to-follow) is hidden by default.
-The native navigation and timeline align to the left, removing X's empty centering gutter;
-the timeline grows to fill all remaining width beside the navigation. Fixed-width frame wrappers
+The navigation and timeline share Grok's native frame: 980px of content plus a 70px trailing gutter,
+with the same centered navigation position. The frame shrinks to fit narrower windows. Fixed-width frame wrappers
 also shrink on portrait displays, avoiding horizontal overflow. Home,
 profiles, posts, search and lists therefore share one column geometry, and pages that have no
 right column (Grok, Settings) keep X's own layout. Images and videos scale with the reading column and keep their aspect
-ratio. Make X Great Again keeps its floating controls; no blank lane is reserved for its panel.
+ratio. Make X Great Again keeps its floating controls in the trailing space.
 
 On Home in wide mode, the floating "new posts" pill and in-flow "Show N posts" row are hidden.
 Other status messages remain visible; refresh the page manually when you want new posts.
@@ -76,7 +76,7 @@ since content scripts can't see the page's `pushState` calls from the isolated w
 - The layout selectors follow X's `data-testid` attributes (`sidebarColumn`, `primaryColumn`). Those
   are stable in practice but not a contract — if X reshuffles them, the CSS needs a look.
 - Reading layout is checked at 1152, 1280, 1512, and 1920px, including a portrait display.
-  The column fills the actual main area, with no fixed tool lane or 990px frame cap.
+  The reading frame follows Grok's 1050px outer frame and shrinks with the window.
   Narrow mobile layouts are not a target.
 
 ---
@@ -90,7 +90,7 @@ since content scripts can't see the page's `pushState` calls from the isolated w
 
 ## 功能
 
-**宽阅读布局。** 默认隐藏右栏（搜索、趋势、推荐关注），原生导航和时间线整体左对齐，消除导航左侧的居中留白。阅读列填满左导航之外的全部剩余宽度，固定宽度的外层容器也随竖屏缩小，避免横向溢出。Make X Great Again 保留悬浮入口，不再预留空白栏。首页、个人主页、帖子详情、搜索、列表因此使用同一套版心；本来就没有右栏的页面（Grok、设置）保持 X 原样。单张图片按原比例在帖子中居中，竖图高度最多 720px；横屏图片和视频随阅读栏放大。
+**宽阅读布局。** 默认隐藏右栏（搜索、趋势、推荐关注），以 Grok 原生排版为基准，统一导航位置与内容起始线，版心宽 980px，右侧保留 70px 留白；导航沿用原生居中边距，固定宽度的外层容器也随竖屏缩小，避免横向溢出。Make X Great Again 保留悬浮入口，保留原生右侧留白。首页、个人主页、帖子详情、搜索、列表因此使用同一套版心；本来就没有右栏的页面（Grok、设置）保持 X 原样。单张图片按原比例在帖子中居中，竖图高度最多 720px；横屏图片和视频随阅读栏放大。
 
 首页宽阅读模式隐藏“有新帖子”悬浮条和“显示 N 条帖子”提示行；其他状态消息仍显示，需要更新时可手动刷新。
 
@@ -139,4 +139,4 @@ isolated world 里看不到页面的 `pushState`，它靠监听 `<title>` 变化
   所以在普通标签页可能会弹出书签对话框。PWA 窗口一般没有这条命令，而那正是这个绑定真正要解决的场景。
 - 布局选择器依赖 X 的 `data-testid`（`sidebarColumn`、`primaryColumn`）。实际上挺稳定，但不是什么契约，
   X 一旦改结构，CSS 就得跟着看一眼。
-- 阅读布局按 1152、1280、1512、1920px 检查，包含竖屏；阅读列填满实际主区域，不再预留工具栏，也不受 990px 外层宽度限制。暂不针对手机窄屏布局。
+- 阅读布局按 1152、1280、1512、1920px 检查，包含竖屏；阅读区沿用 Grok 的 1050px 外框，并随窗口缩小。暂不针对手机窄屏布局。

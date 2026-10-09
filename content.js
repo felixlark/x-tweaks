@@ -61,8 +61,8 @@
     });
   }
 
-  // X's header includes an empty centering gutter even when its inner navigation
-  // is compact. Measure the native inner wrapper; never impose a nav breakpoint.
+  // Measure the native inner navigation so the Grok-aligned frame follows X's
+  // expanded/compact navigation without imposing our own breakpoint.
   let navWrapper = null;
   const navResizeObserver = new ResizeObserver(() => syncNavigationWidth());
   function syncNavigationWidth() {
