@@ -2,6 +2,13 @@
 
 /* Navigation stays entirely native, including X's responsive compact mode. */
 
+/* Collapse the navigation's centering gutter to its native inner width. Scope
+   this to wide reading pages so Chat and pages without a sidebar stay native. */
+html[data-xr="wide"]:not([data-xr-chat]) header:has(+ main [data-testid="primaryColumn"]):has(+ main [data-testid="sidebarColumn"]) {
+  flex: 0 0 auto !important;
+  width: var(--xr-nav-width, max-content) !important;
+}
+
 /* 1. Hide the right column (search / trends / who-to-follow). */
 html[data-xr="wide"]:not([data-xr-chat]) [data-testid="sidebarColumn"] { display: none !important; }
 

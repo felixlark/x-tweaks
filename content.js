@@ -61,6 +61,23 @@
     });
   }
 
+  // X's header includes an empty centering gutter even when its inner navigation
+  // is compact. Measure the native inner wrapper; never impose a nav breakpoint.
+  let navWrapper = null;
+  const navResizeObserver = new ResizeObserver(() => syncNavigationWidth());
+  function syncNavigationWidth() {
+    const header = document.querySelector('header:has(nav)');
+    const wrapper = header?.firstElementChild;
+    if (wrapper !== navWrapper) {
+      navResizeObserver.disconnect();
+      navWrapper = wrapper || null;
+      if (navWrapper) navResizeObserver.observe(navWrapper);
+    }
+    if (!wrapper) return;
+    const width = wrapper.getBoundingClientRect().width;
+    if (width > 0) header.style.setProperty("--xr-nav-width", `${width}px`);
+  }
+
   let contentSyncQueued = false;
   function scheduleContentSync() {
     if (contentSyncQueued) return;
@@ -69,6 +86,7 @@
       contentSyncQueued = false;
       syncNewPostsRow();
       syncSinglePhotos();
+      syncNavigationWidth();
     });
   }
 
@@ -187,6 +205,7 @@
     watchRoute();
     syncNewPostsRow();
     syncSinglePhotos();
+    syncNavigationWidth();
     new MutationObserver(scheduleContentSync).observe(document.body, { childList: true, subtree: true });
     document.addEventListener("load", (event) => {
       if (event.target.matches?.('[data-testid="tweetPhoto"] img')) scheduleContentSync();

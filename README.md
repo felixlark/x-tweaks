@@ -12,7 +12,7 @@ injected into x.com and nothing else.
 ## What it does
 
 **Wide reading layout.** The right column (search, trends, who-to-follow) is hidden by default.
-The left navigation and the timeline's left edge stay exactly where X puts them, on every page;
+The native navigation and timeline align to the left, removing X's empty centering gutter;
 the timeline grows to fill all remaining width beside the navigation. Fixed-width frame wrappers
 also shrink on portrait displays, avoiding horizontal overflow. Home,
 profiles, posts, search and lists therefore share one column geometry, and pages that have no
@@ -90,7 +90,7 @@ since content scripts can't see the page's `pushState` calls from the isolated w
 
 ## 功能
 
-**宽阅读布局。** 默认隐藏右栏（搜索、趋势、推荐关注），左侧导航和时间线左边缘在所有页面都保持 X 原生位置，阅读列填满左导航之外的全部剩余宽度，固定宽度的外层容器也随竖屏缩小，避免横向溢出。Make X Great Again 保留悬浮入口，不再预留空白栏。首页、个人主页、帖子详情、搜索、列表因此使用同一套版心；本来就没有右栏的页面（Grok、设置）保持 X 原样。单张图片按原比例在帖子中居中，竖图高度最多 720px；横屏图片和视频随阅读栏放大。
+**宽阅读布局。** 默认隐藏右栏（搜索、趋势、推荐关注），原生导航和时间线整体左对齐，消除导航左侧的居中留白。阅读列填满左导航之外的全部剩余宽度，固定宽度的外层容器也随竖屏缩小，避免横向溢出。Make X Great Again 保留悬浮入口，不再预留空白栏。首页、个人主页、帖子详情、搜索、列表因此使用同一套版心；本来就没有右栏的页面（Grok、设置）保持 X 原样。单张图片按原比例在帖子中居中，竖图高度最多 720px；横屏图片和视频随阅读栏放大。
 
 首页宽阅读模式隐藏“有新帖子”悬浮条和“显示 N 条帖子”提示行；其他状态消息仍显示，需要更新时可手动刷新。
 
