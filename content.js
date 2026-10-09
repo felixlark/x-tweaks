@@ -9,10 +9,7 @@
   const STORAGE_KEY = "x-reader:right-collapsed";
   const ATTR = "data-xr";
   const CHAT_ATTR = "data-xr-chat";
-  const NAV_ATTR = "data-xr-nav";
   const BTN_ID = "x-reader-toggle";
-  const NAV_LABEL_CLASS = "xr-nav-label";
-  const observedNavHeaders = new WeakSet();
 
   // Default = collapsed (wide). Only an explicit "false" reopens the right column.
   const isCollapsed = () => localStorage.getItem(STORAGE_KEY) !== "false";
@@ -21,160 +18,6 @@
   // Chat currently uses /i/chat; keep /messages for older X deployments. The open
   // conversation lives in sidebarColumn, so wide mode must yield to the two panes.
   const isChatRoute = () => /^\/(?:i\/chat|messages)(\/|$)/.test(location.pathname);
-
-  // X removes the label nodes entirely when it chooses its compact navigation,
-  // notably on Chat. Keep the visible wording close to X's expanded navigation
-  // while falling back to the localized aria-label for languages we do not map.
-  const NAV_LABEL_ALIASES = new Map([
-    ["Search and explore", "Explore"],
-    ["Direct Messages", "Chat"],
-    ["More menu items", "More"],
-    ["Account menu", "Account"],
-  ]);
-
-  function nativeText(el) {
-    const clone = el.cloneNode(true);
-    clone.querySelectorAll(`.${NAV_LABEL_CLASS}`).forEach((label) => label.remove());
-    return (clone.textContent || "").trim();
-  }
-
-  function navLabel(el) {
-    const aria = (el.getAttribute("aria-label") || "").trim();
-    if (!aria) return "";
-    if (NAV_LABEL_ALIASES.has(aria)) return NAV_LABEL_ALIASES.get(aria);
-    return aria.replace(/\s+\([^)]*unread[^)]*\)$/i, "");
-  }
-
-  function clearForcedNav() {
-    document.documentElement.removeAttribute(NAV_ATTR);
-    document
-      .querySelectorAll(`.${NAV_LABEL_CLASS}, .xr-nav-account-copy`)
-      .forEach((label) => label.remove());
-    document
-      .querySelectorAll(
-        "[data-xr-nav-header], [data-xr-nav-shell], [data-xr-nav-content], " +
-          "[data-xr-nav-panel], [data-xr-nav-item], [data-xr-nav-label-host], [data-xr-nav-kind]"
-      )
-      .forEach((el) => {
-        el.style.removeProperty("--xr-nav-color");
-        for (const name of [...el.getAttributeNames()]) {
-          if (name.startsWith("data-xr-nav-")) el.removeAttribute(name);
-        }
-      });
-  }
-
-  function ensureAccountCopy(item, header) {
-    const profileHref =
-      header.querySelector('[data-testid="AppTabBar_Profile_Link"]')?.getAttribute("href") || "";
-    const handle = profileHref.split("/").filter(Boolean)[0] || "";
-    const name = item.querySelector("img[alt]")?.getAttribute("alt")?.trim() || handle || "Account";
-
-    let copy = item.querySelector(":scope > .xr-nav-account-copy");
-    if (!copy) {
-      copy = document.createElement("span");
-      copy.className = "xr-nav-account-copy";
-
-      const nameEl = document.createElement("span");
-      nameEl.className = "xr-nav-account-name";
-      const handleEl = document.createElement("span");
-      handleEl.className = "xr-nav-account-handle";
-      copy.append(nameEl, handleEl);
-      item.appendChild(copy);
-    }
-
-    const nameEl = copy.querySelector(".xr-nav-account-name");
-    if (nameEl.textContent !== name) nameEl.textContent = name;
-    const handleEl = copy.querySelector(".xr-nav-account-handle");
-    const handleText = handle ? `@${handle}` : "";
-    if (handleEl.textContent !== handleText) handleEl.textContent = handleText;
-    handleEl.hidden = !handle;
-  }
-
-  function markForcedNav(nav) {
-    const header = nav.closest("header");
-    if (!header) return;
-
-    document.documentElement.setAttribute(NAV_ATTR, "forced");
-    header.setAttribute("data-xr-nav-header", "");
-    nav.setAttribute("data-xr-nav-panel", "");
-    if (!observedNavHeaders.has(header)) {
-      // Theme changes can update only native icon classes/styles, without
-      // inserting nodes. Re-sample their color when that happens.
-      new MutationObserver(scheduleNavSync).observe(header, {
-        attributes: true, subtree: true, attributeFilter: ["class", "style"],
-      });
-      observedNavHeaders.add(header);
-    }
-
-    // X's expanded layout uses two 259px content wrappers inside three 275px
-    // shell wrappers. Mark the live structure rather than relying on hash classes.
-    let ancestor = nav.parentElement;
-    for (let depth = 0; ancestor && ancestor !== header; depth++, ancestor = ancestor.parentElement) {
-      ancestor.setAttribute(depth < 2 ? "data-xr-nav-content" : "data-xr-nav-shell", "");
-    }
-
-    const items = [
-      ...nav.querySelectorAll('a, button, [role="button"]'),
-      ...header.querySelectorAll(
-        '[data-testid="SideNav_NewTweet_Button"], [data-testid="SideNav_AccountSwitcher_Button"]'
-      ),
-    ];
-
-    for (const item of new Set(items)) {
-      const testId = item.getAttribute("data-testid") || "";
-      const kind =
-        testId === "SideNav_NewTweet_Button"
-          ? "post"
-          : testId === "SideNav_AccountSwitcher_Button"
-            ? "account"
-            : "tab";
-      item.setAttribute("data-xr-nav-item", "");
-      item.setAttribute("data-xr-nav-kind", kind);
-      const icon = item.querySelector("svg");
-      if (icon) {
-        // Compact X anchors retain the browser's default link color. The
-        // native SVG, unlike its wrapper, carries the actual theme color.
-        const color = getComputedStyle(icon).color;
-        if (item.style.getPropertyValue("--xr-nav-color") !== color) {
-          item.style.setProperty("--xr-nav-color", color);
-        }
-      }
-
-      if (kind === "account") {
-        ensureAccountCopy(item, header);
-        continue;
-      }
-
-      const text = navLabel(item);
-      const host = item.firstElementChild;
-      if (!text || !host) continue;
-
-      host.setAttribute("data-xr-nav-label-host", "");
-      let label = host.querySelector(`:scope > .${NAV_LABEL_CLASS}`);
-      if (!label) {
-        label = document.createElement("span");
-        label.className = NAV_LABEL_CLASS;
-        host.appendChild(label);
-      }
-      if (label.textContent !== text) label.textContent = text;
-    }
-  }
-
-  function syncNav() {
-    const nav = document.querySelector('nav[aria-label="Primary"]');
-    const home = nav?.querySelector('[data-testid="AppTabBar_Home_Link"]');
-    if (!nav || !home) {
-      if (document.documentElement.hasAttribute(NAV_ATTR)) clearForcedNav();
-      return;
-    }
-
-    if (nativeText(home)) {
-      if (document.documentElement.hasAttribute(NAV_ATTR)) clearForcedNav();
-      return;
-    }
-
-    markForcedNav(nav);
-  }
 
   // X also inserts an in-flow "Show N posts" row when new Home posts arrive.
   // Mark only that exact row so CSS can hide its whole 49px footprint in wide
@@ -201,7 +44,8 @@
         frame.style.removeProperty("--xr-photo-ratio");
       }
     });
-    document.querySelectorAll('[data-testid="tweet"] [data-testid="tweetPhoto"]').forEach((photo) => {
+    if (isChatRoute()) return;
+    document.querySelectorAll('[data-testid="primaryColumn"] [data-testid="tweet"] [data-testid="tweetPhoto"]').forEach((photo) => {
       const tweet = photo.closest('[data-testid="tweet"]');
       if (tweet.querySelectorAll('[data-testid="tweetPhoto"]').length !== 1) return;
       if (photo.querySelector('[data-testid="previewInterstitial"], video')) return;
@@ -217,13 +61,12 @@
     });
   }
 
-  let navSyncQueued = false;
-  function scheduleNavSync() {
-    if (navSyncQueued) return;
-    navSyncQueued = true;
+  let contentSyncQueued = false;
+  function scheduleContentSync() {
+    if (contentSyncQueued) return;
+    contentSyncQueued = true;
     requestAnimationFrame(() => {
-      navSyncQueued = false;
-      syncNav();
+      contentSyncQueued = false;
       syncNewPostsRow();
       syncSinglePhotos();
     });
@@ -330,7 +173,7 @@
       if (location.pathname === last) return;
       last = location.pathname;
       apply(isCollapsed());
-      scheduleNavSync();
+      scheduleContentSync();
     };
     window.addEventListener("popstate", check);
     if (document.head) {
@@ -342,14 +185,13 @@
   function init() {
     buildButton();
     watchRoute();
-    syncNav();
     syncNewPostsRow();
     syncSinglePhotos();
-    new MutationObserver(scheduleNavSync).observe(document.body, { childList: true, subtree: true });
+    new MutationObserver(scheduleContentSync).observe(document.body, { childList: true, subtree: true });
     document.addEventListener("load", (event) => {
-      if (event.target.matches?.('[data-testid="tweetPhoto"] img')) scheduleNavSync();
+      if (event.target.matches?.('[data-testid="tweetPhoto"] img')) scheduleContentSync();
     }, true);
-    window.addEventListener("resize", scheduleNavSync);
+    window.addEventListener("resize", scheduleContentSync);
   }
 
   // Apply the switch as early as possible to avoid a flash of the old layout.

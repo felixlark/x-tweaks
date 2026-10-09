@@ -31,9 +31,9 @@ dark themes without a theme setting of its own.
 Installed-PWA windows have no back/forward buttons, which is the case this exists for; the
 shortcuts work in ordinary tabs too.
 
-**Persistent navigation labels.** If X switches a page to its compact icon-only navigation, the
-extension restores visible labels at X's own expanded geometry, so the navigation looks and
-sits the same as on Home. This keeps the left navigation readable on Chat and on any other route where X applies the compact variant.
+**Native responsive navigation.** X controls its own expanded or compact navigation. The extension
+does not inject labels or force navigation widths, so Chat keeps enough room for the conversation
+and composer on portrait displays.
 
 **Chat stays native.** On `/i/chat` (and the legacy `/messages` route) the open conversation is rendered inside the same
 `sidebarColumn` that wide mode hides, so the extension forces X's normal two-pane layout there
@@ -60,7 +60,7 @@ to the source, hit **Reload** on the extension card and refresh the x.com window
 | `content.js` | Owns the persisted on/off boolean and the floating toggle button |
 | `nav-keys.js` | The `⌘⇧E` / `⌘⇧D` history bindings |
 | `icons/` | Source SVGs plus the rendered 16/32/48/128 PNGs |
-| `tests/compact-nav.html` | Local regression fixture for X's compact icon-only navigation |
+| `tests/compact-nav.html` | Local fixture verifying X's compact navigation stays native |
 | `store/` | Chrome Web Store listing copy and `package.sh`, which builds the upload zip |
 
 The CSS hangs off attributes on `<html>` rather than generated X class names, which is what makes
@@ -100,7 +100,7 @@ since content scripts can't see the page's `pushState` calls from the isolated w
 **历史快捷键。** `⌘⇧E` 后退，`⌘⇧D` 前进（非 macOS 上用 `Ctrl`）。装成 PWA 的窗口没有前进后退按钮，
 这组绑定就是为那个场景做的；普通标签页里同样能用。
 
-**导航文字始终可见。** X 如果在某个页面切换成只显示图标的紧凑导航，扩展会按 X 原生展开导航的尺寸恢复可见文字，位置和首页一致。聊天页以及以后被 X 套用紧凑导航的其他页面，都不会再丢掉左侧导航文字。
+**导航保持官方响应式布局。** 不再注入导航文字或强制固定宽度，由 X 自己切换展开和紧凑导航，竖屏聊天页为会话和输入框保留完整空间。
 
 **聊天页保持原生布局。** `/i/chat`（以及旧版 `/messages`）里打开的会话正是渲染在宽屏模式要隐藏的那个
 `sidebarColumn` 里，所以扩展在聊天页强制恢复 X 原生的双栏布局，并隐藏悬浮开关。

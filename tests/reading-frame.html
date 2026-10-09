@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <title>X Tweaks reading frame regression</title>
-  <link rel="stylesheet" href="../content.css">
+  <link rel="stylesheet" href="../content.css?v=1.2.3">
   <style>
     * { box-sizing: border-box; }
     body { margin: 0; font: 15px Arial, sans-serif; }
@@ -33,10 +33,15 @@
   </div>
   <button id="mxga-entry">MXGA floating entry</button>
   <script>
+    const params = new URLSearchParams(location.search);
+    if (params.has("chat") || params.has("legacy-chat")) {
+      history.replaceState(null, "", params.has("chat") ? "/i/chat/fixture" : "/messages/fixture");
+      document.querySelector("header").style.flexBasis = "68px";
+    }
     if (new URLSearchParams(location.search).has("no-sidebar")) {
       document.querySelector('[data-testid="sidebarColumn"]').remove();
     }
   </script>
-  <script src="../content.js"></script>
+  <script src="/content.js?v=1.2.3"></script>
 </body>
 </html>

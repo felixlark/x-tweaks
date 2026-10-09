@@ -1,135 +1,16 @@
-/* X Tweaks — all layout behavior hangs off html[data-xr="wide"], set by content.js. */
+/* X Tweaks — all layout behavior hangs off html[data-xr="wide"]:not([data-xr-chat]), set by content.js. */
 
-/* X centers a 1265px application frame; its left header is 275px plus half the
-   remaining gutter. Keep that native navigation track. Reading uses all the
-   remaining space; MXGA keeps its own floating controls without a reserved lane. */
-html {
-  --xr-nav-track: calc(275px + max(0px, (100vw - 1265px) / 2));
-  --xr-nav-font: TwitterChirp, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-}
-
-/* Keep X's primary navigation expanded whenever X omits its native text nodes.
-   content.js marks the live wrapper chain so these rules do not depend on X's
-   generated r-* class names. The 1265px term matches X's native centered desktop
-   gutter: at a 1512px viewport this produces the same 391px header as Home. */
-html[data-xr-nav="forced"] header[data-xr-nav-header] {
-  flex: 0 0 var(--xr-nav-track) !important;
-  width: var(--xr-nav-track) !important;
-  min-width: var(--xr-nav-track) !important;
-}
-
-html[data-xr-nav="forced"] [data-xr-nav-shell] {
-  width: 275px !important;
-  min-width: 275px !important;
-}
-
-html[data-xr-nav="forced"] [data-xr-nav-content],
-html[data-xr-nav="forced"] nav[data-xr-nav-panel] {
-  width: 259px !important;
-  min-width: 259px !important;
-  align-items: flex-start !important;
-}
-
-html[data-xr-nav="forced"] [data-xr-nav-kind="tab"] {
-  width: 259px !important;
-  max-width: 259px !important;
-  align-items: flex-start !important;
-}
-
-html[data-xr-nav="forced"] [data-xr-nav-kind="tab"] [data-xr-nav-label-host] {
-  width: auto !important;
-  max-width: 100% !important;
-  justify-content: center !important;
-}
-
-html[data-xr-nav="forced"] [data-xr-nav-kind="tab"] .xr-nav-label {
-  display: block;
-  margin: 0 16px 0 20px;
-  overflow: hidden;
-  color: var(--xr-nav-color, inherit);
-  font: inherit;
-  font-family: var(--xr-nav-font);
-  font-size: 20px;
-  line-height: 24px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-html[data-xr-nav="forced"] [aria-current="page"] .xr-nav-label {
-  font-weight: 700;
-}
-
-/* Post has a different native layout from the tab rows: a 233px pill with
-   32px inline padding. Keep its compact icon, then center the added label. */
-html[data-xr-nav="forced"] [data-xr-nav-kind="post"] {
-  width: 233px !important;
-  height: 52px !important;
-  max-width: none !important;
-  padding-inline: 32px !important;
-  align-items: stretch !important;
-}
-
-html[data-xr-nav="forced"] [data-xr-nav-kind="post"] [data-xr-nav-label-host] {
-  width: auto !important;
-  max-width: none !important;
-  justify-content: center !important;
-}
-
-html[data-xr-nav="forced"] [data-xr-nav-kind="post"] .xr-nav-label {
-  display: block;
-  margin-left: 12px;
-  color: inherit;
-  font: inherit;
-  font-family: var(--xr-nav-font);
-  font-size: 17px;
-  font-weight: 700;
-  line-height: 20px;
-  white-space: nowrap;
-}
-
-/* The compact account control still owns the real avatar. Add a sibling copy
-   block instead of inserting text inside the avatar's column. */
-html[data-xr-nav="forced"] [data-xr-nav-kind="account"] {
-  width: 259px !important;
-  max-width: none !important;
-  min-height: 64px !important;
-  align-items: center !important;
-}
-
-html[data-xr-nav="forced"] .xr-nav-account-copy {
-  display: flex;
-  min-width: 0;
-  margin-left: 12px;
-  overflow: hidden;
-  flex-direction: column;
-  align-items: flex-start;
-  color: inherit;
-  font: inherit;
-  font-family: var(--xr-nav-font);
-  line-height: 20px;
-  white-space: nowrap;
-}
-
-html[data-xr-nav="forced"] .xr-nav-account-name,
-html[data-xr-nav="forced"] .xr-nav-account-handle {
-  display: block;
-  max-width: 155px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-html[data-xr-nav="forced"] .xr-nav-account-name { font-weight: 700; }
-html[data-xr-nav="forced"] .xr-nav-account-handle { opacity: .65; }
+/* Navigation stays entirely native, including X's responsive compact mode. */
 
 /* 1. Hide the right column (search / trends / who-to-follow). */
-html[data-xr="wide"] [data-testid="sidebarColumn"] { display: none !important; }
+html[data-xr="wide"]:not([data-xr-chat]) [data-testid="sidebarColumn"] { display: none !important; }
 
 /* X's Home "new posts" pill is a status region over the first post. Hide only
    that specific control; other status messages (including posting errors) stay. */
-html[data-xr="wide"] [data-testid="primaryColumn"] [role="status"]:has(> button[aria-label^="New posts are available."]) {
+html[data-xr="wide"]:not([data-xr-chat]) [data-testid="primaryColumn"] [role="status"]:has(> button[aria-label^="New posts are available."]) {
   display: none !important;
 }
-html[data-xr="wide"] [data-testid="primaryColumn"] [data-xr-new-posts-row] {
+html[data-xr="wide"]:not([data-xr-chat]) [data-testid="primaryColumn"] [data-xr-new-posts-row] {
   display: none !important;
 }
 
@@ -155,13 +36,13 @@ html[data-xr="wide"]:not([data-xr-chat]) main div:has([data-testid="primaryColum
 }
 
 /* Restoring the sidebar retains native column caps but lets the reading column
-   shrink to fit a portrait window, including when navigation labels are forced. */
+   shrink to fit a portrait window. */
 html[data-xr="normal"]:not([data-xr-chat]) :has(> [data-testid="sidebarColumn"]) > [data-testid="primaryColumn"] {
   flex: 1 1 600px !important;
   min-width: 0 !important;
 }
 
-html[data-xr="wide"] :has(> [data-testid="sidebarColumn"]) > [data-testid="primaryColumn"] {
+html[data-xr="wide"]:not([data-xr-chat]) :has(> [data-testid="sidebarColumn"]) > [data-testid="primaryColumn"] {
   flex: 1 1 auto !important;
   width: 100% !important;
   max-width: none !important;
@@ -171,31 +52,31 @@ html[data-xr="wide"] :has(> [data-testid="sidebarColumn"]) > [data-testid="prima
 /* 3. THE key one: X caps the timeline at max-width:600px on the div wrapping the
       feed <section>. Release it so posts/text/media fill the column (composer and
       feed align to the same width) instead of sitting in a narrow 600px strip. */
-html[data-xr="wide"] [data-testid="primaryColumn"] div:has(> section) {
+html[data-xr="wide"]:not([data-xr-chat]) [data-testid="primaryColumn"] div:has(> section) {
   max-width: none !important;
 }
 
 /* 4. Release X's inline media width caps so images/videos grow with the column. */
-html[data-xr="wide"] [data-testid="primaryColumn"] [style*="max-width"] {
+html[data-xr="wide"]:not([data-xr-chat]) [data-testid="primaryColumn"] [data-testid="tweet"] [style*="max-width"]:has([data-testid="tweetPhoto"], [data-testid="videoComponent"], [data-testid="videoPlayer"]) {
   max-width: 100% !important;
 }
 
 /* 5. Give tall photos/videos more vertical room (bounded so portraits stay sane). */
-html[data-xr="wide"] [data-testid="primaryColumn"] [data-testid="tweetPhoto"],
-html[data-xr="wide"] [data-testid="primaryColumn"] [data-testid="tweetPhoto"] img,
-html[data-xr="wide"] [data-testid="primaryColumn"] [data-testid="videoComponent"],
-html[data-xr="wide"] [data-testid="primaryColumn"] [data-testid="videoPlayer"] {
+html[data-xr="wide"]:not([data-xr-chat]) [data-testid="primaryColumn"] [data-testid="tweetPhoto"],
+html[data-xr="wide"]:not([data-xr-chat]) [data-testid="primaryColumn"] [data-testid="tweetPhoto"] img,
+html[data-xr="wide"]:not([data-xr-chat]) [data-testid="primaryColumn"] [data-testid="videoComponent"],
+html[data-xr="wide"]:not([data-xr-chat]) [data-testid="primaryColumn"] [data-testid="videoPlayer"] {
   max-height: min(88vh, 1100px) !important;
 }
 
 /* X fixes single photos to a 510px-tall inline box. Scale that box by the
    image's own ratio (provided by content.js), then let its ratio placeholder
    determine height. Portraits gain room without being stretched or cropped. */
-html[data-xr="wide"] [data-xr-photo-frame] {
+html[data-xr="wide"]:not([data-xr-chat]) [data-xr-photo-frame] {
   width: min(100%, calc(min(88vh, 720px) * var(--xr-photo-ratio))) !important;
   align-self: center !important;
 }
-html[data-xr="wide"] [data-xr-photo-frame] a > div[style*="width"][style*="height"] {
+html[data-xr="wide"]:not([data-xr-chat]) [data-xr-photo-frame] a > div[style*="width"][style*="height"] {
   width: 100% !important;
   height: auto !important;
 }
@@ -204,7 +85,7 @@ html[data-xr="wide"] [data-xr-photo-frame] a > div[style*="width"][style*="heigh
       bookmark + share as fixed trailing items, so they bunch up once the tweet is
       widened. Make all six children share the row equally. Scoped to the action bar
       (the group that contains the reply button) so no other role="group" is touched. */
-html[data-xr="wide"] [role="group"]:has([data-testid="reply"]) > div {
+html[data-xr="wide"]:not([data-xr-chat]) [data-testid="primaryColumn"] [data-testid="tweet"] [role="group"]:has([data-testid="reply"]) > div {
   flex: 1 1 0 !important;
   min-width: 0 !important;
   justify-content: flex-start !important;

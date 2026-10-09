@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "X Tweaks",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Collapse X's right column, widen the timeline, enlarge photos and videos, and add ⌘⇧E / ⌘⇧D history shortcuts.",
   "homepage_url": "https://github.com/longbiaochen/x-tweaks",
   "icons": {
