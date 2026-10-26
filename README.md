@@ -40,6 +40,12 @@ and composer on portrait displays.
 and hides the toggle. Your wide/normal choice is untouched and comes back as soon as you leave
 the chat page.
 
+**Chat defaults to Groups.** Each fresh visit to `/i/chat` selects the native Groups filter.
+You can switch to All or another filter for the rest of that visit. Reloading, reopening the
+page, or leaving Chat and coming back starts with Groups again. If you open the filter before
+initialization finishes, your choice takes priority. The extension only operates the native
+filter controls, including their delayed Shadow DOM; it does not inspect conversation text.
+
 ## Install
 
 Chrome doesn't allow linking to its own settings pages, so run:
@@ -57,7 +63,7 @@ to the source, hit **Reload** on the extension card and refresh the x.com window
 | --- | --- |
 | `manifest.json` | MV3 manifest; content scripts matched against `x.com` and `twitter.com` |
 | `content.css` | All layout rules, gated on `html[data-xr="wide"]` |
-| `content.js` | Owns the persisted on/off boolean and the floating toggle button |
+| `content.js` | Owns the reading toggle and initializes the native Chat filter |
 | `nav-keys.js` | The `⌘⇧E` / `⌘⇧D` history bindings |
 | `icons/` | Source SVGs plus the rendered 16/32/48/128 PNGs |
 | `tests/compact-nav.html` | Local fixture verifying X's compact navigation stays native |
@@ -67,6 +73,21 @@ The CSS hangs off attributes on `<html>` rather than generated X class names, wh
 it survive X's client-side navigation. Chat routes (`/i/chat` and legacy `/messages`) make wide mode
 yield to the chat panes; the script detects SPA navigation by observing `<title>`,
 since content scripts can't see the page's `pushState` calls from the isolated world.
+
+## Filter regression test
+
+The extension still has no runtime dependencies or build step. The automated DOM fixture uses
+jsdom 26.1.0 as a temporary test dependency:
+
+```bash
+scratch=$(mktemp -d)
+npm install --prefix "$scratch" --no-audit --no-fund --package-lock=false jsdom@26.1.0
+NODE_PATH="$scratch/node_modules" node --test tests/chat-default-groups.test.cjs
+rm -rf "$scratch"
+```
+
+The fixture covers delayed Shadow DOM/menu mounting, overlay menus, route visits, manual choices,
+and trigger remounting. Installation and the real X page are verified separately.
 
 ## Known limits
 
@@ -78,6 +99,8 @@ since content scripts can't see the page's `pushState` calls from the isolated w
 - Reading layout is checked at 1152, 1280, 1512, and 1920px, including a portrait display.
   The reading frame follows Grok's 1050px outer frame and shrinks with the window.
   Narrow mobile layouts are not a target.
+- Chat initialization follows the native `xchatEmbedRoute` / `xchatEmbedOverlays` hosts and
+  `dm-inbox-dropdown-*` controls. If X changes those identifiers, this feature needs updating.
 
 ---
 
@@ -106,6 +129,11 @@ since content scripts can't see the page's `pushState` calls from the isolated w
 `sidebarColumn` 里，所以扩展在聊天页强制恢复 X 原生的双栏布局，并隐藏悬浮开关。
 宽/窄的选择不受影响，离开聊天页后立即恢复。
 
+**聊天默认群组。** 每次重新进入 `/i/chat` 时，自动选中 X 原生的 Groups 筛选。
+本次访问中可以手动改为 All 或其他筛选；刷新、关闭再打开或离开聊天页后返回，会重新默认 Groups。
+初始化完成前如已手动打开筛选菜单，则优先保留用户选择。扩展只操作原生筛选控件，
+支持延迟挂载的 Shadow DOM，不读取会话正文。
+
 ## 安装
 
 Chrome 不允许从链接跳到自己的设置页，所以用命令打开：
@@ -123,7 +151,7 @@ open -a "Google Chrome" "chrome://extensions"
 | --- | --- |
 | `manifest.json` | MV3 manifest，内容脚本匹配 `x.com` 和 `twitter.com` |
 | `content.css` | 全部布局规则，挂在 `html[data-xr="wide"]` 上 |
-| `content.js` | 负责持久化的开关状态和那个悬浮按钮 |
+| `content.js` | 负责阅读开关状态、悬浮按钮及聊天原生筛选初始化 |
 | `nav-keys.js` | `⌘⇧E` / `⌘⇧D` 历史导航绑定 |
 | `icons/` | 图标源 SVG 和渲染出来的 16/32/48/128 PNG |
 | `tests/compact-nav.html` | X 紧凑型纯图标导航的本地回归夹具 |
