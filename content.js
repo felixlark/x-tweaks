@@ -1,8 +1,8 @@
 // X Tweaks — reading-layout content script.
 //
 // CSS lives in content.css and hangs off html[data-xr="wide"], so it survives
-// SPA navigation for free. This script only owns the persisted on/off boolean
-// and the floating toggle button. Runs in normal tabs AND installed-PWA windows.
+// SPA navigation for free. This script owns the reading toggle and initializes
+// the native Chat filter. Runs in normal tabs AND installed-PWA windows.
 (function () {
   "use strict";
 
@@ -10,6 +10,120 @@
   const ATTR = "data-xr";
   const CHAT_ATTR = "data-xr-chat";
   const BTN_ID = "x-reader-toggle";
+  const CHAT_FILTER_TRIGGER = '[data-testid="dm-inbox-dropdown-trigger"]';
+  const CHAT_GROUPS_OPTION = '[data-testid="dm-inbox-dropdown-groups"][role="menuitemradio"]';
+
+  let chatVisit = null;
+  let chatFilterTimer = null;
+  let ownFilterClick = false;
+  const chatFilterRoots = new Map();
+
+  function stopChatFilterWatch() {
+    clearTimeout(chatFilterTimer);
+    chatFilterTimer = null;
+    for (const [root, observer] of chatFilterRoots) {
+      observer.disconnect();
+      root.removeEventListener("click", onChatFilterInteraction, true);
+      root.removeEventListener("pointerdown", onChatFilterInteraction, true);
+      root.removeEventListener("keydown", onChatFilterInteraction, true);
+    }
+    chatFilterRoots.clear();
+  }
+
+  function finishChatFilter() {
+    chatVisit.phase = "done";
+    stopChatFilterWatch();
+  }
+
+  function onChatFilterInteraction(event) {
+    if (ownFilterClick || !chatVisit) return;
+    // A user who reaches the filter before initialization owns this visit too.
+    if (event.target.closest?.(`${CHAT_FILTER_TRIGGER}, [role="menuitemradio"][data-testid^="dm-inbox-dropdown-"]`)) {
+      finishChatFilter();
+    }
+  }
+
+  function clickChatFilter(element) {
+    ownFilterClick = true;
+    try {
+      element.click();
+    } finally {
+      ownFilterClick = false;
+    }
+  }
+
+  function syncChatDefault() {
+    if (!/^\/i\/chat(?:\/|$)/.test(location.pathname)) {
+      stopChatFilterWatch();
+      chatVisit = null;
+      return;
+    }
+    if (!chatVisit) chatVisit = { phase: "pending" };
+    if (chatVisit.phase === "done") return;
+
+    const roots = [...document.querySelectorAll('[data-testid="xchatEmbedRoute"], [data-testid="xchatEmbedOverlays"]')]
+      .map((host) => host.shadowRoot).filter(Boolean);
+    for (const [root, observer] of chatFilterRoots) {
+      if (roots.includes(root)) continue;
+      observer.disconnect();
+      root.removeEventListener("click", onChatFilterInteraction, true);
+      root.removeEventListener("pointerdown", onChatFilterInteraction, true);
+      root.removeEventListener("keydown", onChatFilterInteraction, true);
+      chatFilterRoots.delete(root);
+    }
+    for (const root of roots) {
+      if (chatFilterRoots.has(root)) continue;
+      const observer = new MutationObserver(scheduleContentSync);
+      observer.observe(root, {
+        childList: true, subtree: true, attributes: true,
+        attributeFilter: ["aria-expanded", "aria-checked", "disabled", "aria-disabled"]
+      });
+      root.addEventListener("click", onChatFilterInteraction, true);
+      root.addEventListener("pointerdown", onChatFilterInteraction, true);
+      root.addEventListener("keydown", onChatFilterInteraction, true);
+      chatFilterRoots.set(root, observer);
+    }
+
+    const trigger = roots.map((root) => root.querySelector(CHAT_FILTER_TRIGGER)).find(Boolean);
+    if (trigger && !trigger.disabled && trigger.getAttribute("aria-disabled") !== "true") {
+      if (chatVisit.phase === "pending") {
+        // Do not take over a menu that was already open when we discovered it.
+        if (trigger.getAttribute("aria-expanded") === "true") {
+          finishChatFilter();
+          return;
+        }
+        chatVisit.phase = "opening";
+        chatVisit.trigger = trigger;
+        clickChatFilter(trigger);
+      }
+      if (chatVisit.trigger === trigger) {
+        const groups = roots.map((root) => root.querySelector(CHAT_GROUPS_OPTION)).find(Boolean);
+        if (chatVisit.phase === "opening" && groups?.closest('[role="menu"]')) {
+          if (groups.getAttribute("aria-checked") === "true") {
+            finishChatFilter();
+            clickChatFilter(trigger);
+            return;
+          }
+          chatVisit.label = groups.textContent.trim();
+          chatVisit.phase = "selecting";
+          clickChatFilter(groups);
+        }
+        if (chatVisit.phase === "selecting" && chatVisit.label &&
+            trigger.textContent.trim() === chatVisit.label) {
+          finishChatFilter();
+          return;
+        }
+      } else {
+        // A remount during initialization gets the new native trigger.
+        chatVisit.phase = "pending";
+      }
+    }
+
+    // attachShadow() is invisible to a document observer. Poll only while this
+    // visit is waiting for its native controls, then disconnect after selection.
+    clearTimeout(chatFilterTimer);
+    chatFilterTimer = setTimeout(syncChatDefault, 250);
+  }
 
   // Default = collapsed (wide). Only an explicit "false" reopens the right column.
   const isCollapsed = () => localStorage.getItem(STORAGE_KEY) !== "false";
@@ -87,6 +201,7 @@
       syncNewPostsRow();
       syncSinglePhotos();
       syncNavigationWidth();
+      syncChatDefault();
     });
   }
 
@@ -192,6 +307,7 @@
       last = location.pathname;
       apply(isCollapsed());
       scheduleContentSync();
+      syncChatDefault();
     };
     window.addEventListener("popstate", check);
     if (document.head) {
@@ -206,6 +322,7 @@
     syncNewPostsRow();
     syncSinglePhotos();
     syncNavigationWidth();
+    syncChatDefault();
     new MutationObserver(scheduleContentSync).observe(document.body, { childList: true, subtree: true });
     document.addEventListener("load", (event) => {
       if (event.target.matches?.('[data-testid="tweetPhoto"] img')) scheduleContentSync();
