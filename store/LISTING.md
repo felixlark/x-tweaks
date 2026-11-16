@@ -10,7 +10,7 @@ Build the upload archive with `./store/package.sh`.
 - **Language**: English (add Simplified Chinese as a second listing locale; copy below)
 - **Version**: taken from `manifest.json` (currently 1.1.0)
 - **Icon**: `icons/icon128.png`
-- **Homepage / support URL**: `https://github.com/longbiaochen/x-tweaks`
+- **Homepage / support URL**: `https://github.com/felixlark/x-tweaks`
 
 The 132-character cap applies to `manifest.json`'s `description` too, not just the listing field —
 upload is rejected outright if the manifest exceeds it. Both are kept identical to the text below.
